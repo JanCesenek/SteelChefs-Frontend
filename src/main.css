@@ -1,0 +1,138 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@media (min-width: 2200px) {
+  html {
+    font-size: 75%;
+  }
+}
+
+html {
+  font-size: 62.5%;
+}
+
+@media (max-width: 1200px) {
+  html {
+    font-size: 56.25%;
+  }
+}
+
+@media (max-width: 900px) {
+  html {
+    font-size: 50%;
+  }
+}
+
+@media (max-width: 600px) {
+  html {
+    font-size: 37.5%;
+  }
+}
+
+body {
+  margin: 0;
+  font-family: "Beiruti", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: url("https://jwylvnqdlbtbmxsencfu.supabase.co/storage/v1/object/public/steelchefs/staticImgs/SteelchefsBgImage.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  font-size: 2.5rem;
+}
+
+h1 {
+  font-family: "Roboto Slab", serif;
+}
+
+::-webkit-scrollbar {
+  width: 1rem;
+}
+::-webkit-scrollbar-track {
+  background: black;
+}
+::-webkit-scrollbar-thumb {
+  background: rgb(239, 68, 68);
+}
+
+.image-limit {
+  max-width: 80rem;
+  max-height: 80rem;
+  border-radius: 1rem;
+}
+
+@media (max-width: 1200px) {
+  .image-limit {
+    max-width: 50rem;
+    max-height: 50rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .image-limit {
+    max-width: 40rem;
+    max-height: 40rem;
+  }
+}
+
+.link-class {
+  color: purple;
+  text-decoration: underline;
+  font-weight: 800;
+}
+
+.fullscreen-editor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.95);
+  padding: 5rem 2rem;
+  box-sizing: border-box;
+  overflow: auto;
+  margin: 0;
+}
+
+.resizable-editor {
+  width: 100%;
+  height: 40rem;
+}
+
+.fullscreen-editor .resizable-editor {
+  height: 100rem;
+}
+
+.resizable-editor .ProseMirror {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+
+.resizable-editor .ProseMirror:focus {
+  outline: none;
+}
+
+.heading-level-1 {
+  font-size: 4rem;
+}
+
+.heading-level-2 {
+  font-size: 3rem;
+}
+
+.heading-level-3 {
+  font-size: 2rem;
+}
+
+.bullet-list {
+  padding-left: 4rem;
+  list-style: circle;
+}
+
+.ordered-list {
+  padding-left: 4rem;
+  list-style-type: decimal;
+}
