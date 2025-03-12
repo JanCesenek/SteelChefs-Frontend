@@ -9,11 +9,10 @@ export function useUpdate(path) {
     return res.data;
   };
 
-  const { data, error, isLoading, refetch, isSuccess } = useQuery([path], fetch, {
+  const { data, error, isLoading, refetch, isSuccess } = useQuery({
+    queryKey: [path],
+    queryFn: fetch,
     enabled: false,
-    onError: (error) => {
-      console.error("Error fetching data:", error);
-    },
   });
 
   return { data, error, isLoading, refetch, isSuccess };
