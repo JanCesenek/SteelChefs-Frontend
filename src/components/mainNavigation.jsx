@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import { FaUserLargeSlash, FaUserLarge, FaUserShield } from "react-icons/fa6";
 import { FaCartPlus } from "react-icons/fa";
 import { GiHamburgerMenu } from "react-icons/gi";
-import { AuthContext } from "../context/authContext";
+import { AuthContext } from "../context/AuthContext";
 
 const MainNavigation = () => {
   const { curUser, admin } = useContext(AuthContext);
