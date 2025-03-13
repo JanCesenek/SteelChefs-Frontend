@@ -4,6 +4,7 @@ import Login from "../components/login";
 import Signup from "../components/signup";
 import { api } from "../core/api";
 import { useUpdate } from "../hooks/use-update";
+import { MdEditDocument, MdError } from "react-icons/md";
 import { BsPencil } from "react-icons/bs";
 import { FiLogOut } from "react-icons/fi";
 import { ImCross } from "react-icons/im";
@@ -11,6 +12,7 @@ import { RiDeleteBin6Fill } from "react-icons/ri";
 import { FaArrowAltCircleDown, FaArrowAltCircleUp } from "react-icons/fa";
 import Button from "../components/button";
 import OrderDetail from "../components/orderDetail";
+import Notification from "../components/notification";
 
 const Auth = () => {
   const { data: usersData, refetch: refetchUsers } = useUpdate("/users");
@@ -52,6 +54,20 @@ const Auth = () => {
 
   const loggedUser = usersData?.find((el) => curUser === el.username);
 
+  useEffect(() => {
+    if (loggedUser) {
+      setFirstName(loggedUser.firstName);
+      setLastName(loggedUser.lastName);
+      setUsername(loggedUser.username);
+      setPassword(loggedUser.password);
+      setStreet(loggedUser.street);
+      setPostcode(loggedUser.postcode);
+      setTown(loggedUser.town);
+      setEmail(loggedUser.email);
+      setPhone(loggedUser.phone);
+    }
+  }, [loggedUser]);
+
   const userOrders = ordersData?.filter((el) => el.userID === loggedUser?.id);
 
   const [firstName, setFirstName] = useState("");
@@ -80,13 +96,26 @@ const Auth = () => {
     delete api.defaults.headers.common["Authorization"];
   };
 
+  const resetData = (msg) => {
+    setNotification(msg);
+    setTimeout(() => {
+      setNotification(false);
+    }, 3000);
+  };
+
   const editDetails = async (data) => {
     await api
       .patch(`/users/${curUser}`, data, {
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       })
       .then(async () => {
-        await refetch();
+        await refetchUsers();
+        resetData(
+          <>
+            <MdEditDocument />
+            <span>Details updated successfully!</span>
+          </>
+        );
         setEditState({
           firstName: false,
           lastName: false,
@@ -102,7 +131,12 @@ const Auth = () => {
       })
       .catch((err) => {
         console.log(`Patch req - ${err}`);
-        setNotification(true);
+        resetData(
+          <>
+            <MdError />
+            <span>Error updating details!</span>
+          </>
+        );
         setEditState({
           firstName: false,
           lastName: false,
@@ -115,9 +149,6 @@ const Auth = () => {
           phone: false,
         });
         resetAll();
-        setTimeout(() => {
-          setNotification(false);
-        }, 3000);
       });
   };
 
@@ -145,11 +176,7 @@ const Auth = () => {
 
   return (
     <div className="w-full min-h-screen flex flex-col items-center">
-      {notification && (
-        <div className="w-[30rem] bg-black text-red-400 animate-pulse rounded-md p-2 mt-10">
-          Incorrect details!
-        </div>
-      )}
+      {notification && <Notification msg={notification} css="mt-20" />}
       {/* If a user is logged in */}
       {curUser ? (
         <div className="bg-black/70 w-[80%] sm:w-full min-h-screen flex flex-col items-center rounded-md shadow-lg shadow-red-600 text-red-600 my-20 sm:my-0 p-10 [&>*]:my-5 [&>*]:rounded-md [&>*]:p-5">
@@ -513,9 +540,9 @@ const Auth = () => {
           )}
         </div>
       ) : newAccount ? (
-        <Signup swap={() => setNewAccount(false)} />
+        <Signup swap={() => setNewAccount(false)} setNotification={(msg) => setNotification(msg)} />
       ) : (
-        <Login swap={() => setNewAccount(true)} />
+        <Login swap={() => setNewAccount(true)} setNotification={(msg) => setNotification(msg)} />
       )}
     </div>
   );

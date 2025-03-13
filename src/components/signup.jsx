@@ -6,8 +6,9 @@ import UseInput from "../hooks/use-input";
 import { useUpdate } from "../hooks/use-update";
 import { FaArrowAltCircleDown, FaArrowAltCircleUp } from "react-icons/fa";
 import Button from "./button";
+import { MdAddCircle } from "react-icons/md";
 
-const Signup = ({ swap }) => {
+const Signup = ({ swap, setNotification }) => {
   const {
     value: firstNameValue,
     isValid: firstNameIsValid,
@@ -115,6 +116,13 @@ const Signup = ({ swap }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [rules, setRules] = useState(false);
 
+  const resetData = (msg) => {
+    setNotification(msg);
+    setTimeout(() => {
+      setNotification(false);
+    }, 3000);
+  };
+
   const { refetch } = useUpdate("/users");
 
   const addBearerToken = (token) => {
@@ -164,8 +172,23 @@ const Signup = ({ swap }) => {
         logIn(username, admin);
         addBearerToken(token);
         resetForm();
+        resetData(
+          <>
+            <MdAddCircle />
+            <span>Account created successfully!</span>
+          </>
+        );
       })
-      .catch((err) => console.log(`Post req - ${err}`));
+      .catch((err) => {
+        console.log(`Post req - ${err}`);
+        resetForm();
+        resetData(
+          <>
+            <MdError />
+            <span>Account creation failed!</span>
+          </>
+        );
+      });
     setIsSubmitting(false);
     swap();
   };

@@ -10,26 +10,33 @@ import Cart from "./pages/cart";
 import Auth from "./pages/auth";
 import { AuthProvider } from "./context/AuthContext";
 
-const router = createBrowserRouter([
+const router = createBrowserRouter(
+  [
+    {
+      path: "/",
+      element: <RootLayout />,
+      children: [
+        { index: true, element: <Intro /> },
+        { path: "products", element: <Products /> },
+        { path: "blog", element: <Blog /> },
+        { path: "reviews", element: <Reviews /> },
+        { path: "contact", element: <Contact /> },
+        { path: "auth", element: <Auth /> },
+        { path: "cart", element: <Cart /> },
+      ],
+    },
+  ],
   {
-    path: "/",
-    element: <RootLayout />,
-    children: [
-      { index: true, element: <Intro /> },
-      { path: "products", element: <Products /> },
-      { path: "blog", element: <Blog /> },
-      { path: "reviews", element: <Reviews /> },
-      { path: "contact", element: <Contact /> },
-      { path: "auth", element: <Auth /> },
-      { path: "cart", element: <Cart /> },
-    ],
-  },
-]);
+    future: {
+      v7_relativeSplatPath: true,
+    },
+  }
+);
 
 function App() {
   return (
     <AuthProvider>
-      <RouterProvider router={router} />
+      <RouterProvider router={router} future={{ v7_startTransition: true }} />
     </AuthProvider>
   );
 }

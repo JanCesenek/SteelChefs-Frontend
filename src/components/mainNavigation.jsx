@@ -6,7 +6,9 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { AuthContext } from "../context/AuthContext";
 
 const MainNavigation = () => {
-  const { curUser, admin } = useContext(AuthContext);
+  const { curUser } = useContext(AuthContext);
+
+  const admin = localStorage.getItem("admin");
 
   const [showMenu, setShowMenu] = useState(false);
 
