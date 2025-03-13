@@ -211,7 +211,6 @@ const Cart = () => {
       email: "",
       phone: "",
     });
-    setSubmittingOrder(false);
     setNotification(msg);
     setTimeout(() => setNotification(false), 3000);
   };
@@ -361,7 +360,6 @@ const Cart = () => {
   return (
     <div className="w-full flex flex-col items-center">
       <div className="w-[80%] xl:w-full flex flex-col items-center bg-black/70 rounded-md shadow-lg shadow-red-800 min-h-screen my-20 xl:my-0">
-        {notification && <Notification msg={notification} css="mt-10" />}
         {dynamicMap?.length > 0 && (
           <div className="flex items-center [&>*]:mx-2 mt-20">
             <span>Wanna go back and keep shopping? Click here.</span>
@@ -584,6 +582,7 @@ const Cart = () => {
                     (submittingOrder || !validForm) && "opacity-50 cursor-not-allowed"
                   } self-center`}
                 />
+                {notification && <Notification msg={notification} css="mt-10 self-center" />}
               </div>
             )}
           </div>
