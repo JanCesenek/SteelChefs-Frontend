@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { MdLogout } from "react-icons/md";
 import { FaArrowAltCircleLeft, FaArrowAltCircleRight } from "react-icons/fa";
@@ -6,6 +6,7 @@ import { ImCross } from "react-icons/im";
 import { api } from "../core/api";
 import { v4 as uuid } from "uuid";
 import Button from "./button";
+import { AuthContext } from "../context/AuthContext";
 
 const ProductDetail = ({
   id,
@@ -19,6 +20,8 @@ const ProductDetail = ({
   unitsData,
   back,
 }) => {
+  const { productNumber, updateProductNumber } = useContext(AuthContext);
+
   const [purchasedAmount, setPurchasedAmount] = useState(1);
 
   const [fullScreen, setFullScreen] = useState(false);
@@ -60,6 +63,7 @@ const ProductDetail = ({
       });
 
       await api.patch(`/products/${id}`, { quantity: quantity - +purchasedAmount });
+      updateProductNumber(productNumber + +purchasedAmount);
     } catch (err) {
       console.error(`Error updating quantity: ${err}`);
     } finally {

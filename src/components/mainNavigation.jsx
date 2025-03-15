@@ -6,7 +6,7 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { AuthContext } from "../context/AuthContext";
 
 const MainNavigation = () => {
-  const { curUser } = useContext(AuthContext);
+  const { curUser, productNumber } = useContext(AuthContext);
 
   const admin = localStorage.getItem("admin");
 
@@ -51,7 +51,14 @@ const MainNavigation = () => {
         <NavLink
           className={({ isActive }) => (isActive ? "underline text-red-200" : "text-red-500")}
           to="cart">
-          <FaCartPlus />
+          <div className="flex items-center [&>*]:mx-2 relative">
+            <FaCartPlus />
+            {productNumber > 0 && (
+              <div className="rounded-full bg-black shadow-sm shadow-red-600 text-red-500 w-[1.5rem] h-[1.5rem] text-[1.5rem] absolute top-0 right-[-1rem] flex justify-center items-center animate-pulse">
+                {productNumber}
+              </div>
+            )}
+          </div>
         </NavLink>
       </nav>
       <nav className="w-3/4 hidden sm:flex justify-around my-5">
@@ -108,7 +115,14 @@ const MainNavigation = () => {
         <NavLink
           className={({ isActive }) => (isActive ? "underline text-red-200" : "text-red-500")}
           to="cart">
-          <FaCartPlus />
+          <div className="flex items-center [&>*]:mx-2 relative">
+            <FaCartPlus />
+            {productNumber > 0 && (
+              <div className="rounded-full bg-black shadow-sm shadow-red-600 text-red-500 w-5 h-5 text-[1.2rem] absolute top-0 right-[-1rem] flex justify-center items-center animate-pulse">
+                {productNumber}
+              </div>
+            )}
+          </div>
         </NavLink>
       </nav>
     </div>

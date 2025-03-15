@@ -5,6 +5,7 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [curUser, setCurUser] = useState(localStorage.getItem("curUser"));
   const [admin, setAdmin] = useState(localStorage.getItem("admin"));
+  const [productNumber, setProductNumber] = useState(0);
 
   useEffect(() => {
     const handleStorageChange = () => {
@@ -32,8 +33,13 @@ export const AuthProvider = ({ children }) => {
     setAdmin(null);
   };
 
+  const updateProductNumber = (number) => {
+    setProductNumber(number);
+  };
+
   return (
-    <AuthContext.Provider value={{ curUser, admin, logIn, logOut }}>
+    <AuthContext.Provider
+      value={{ curUser, admin, logIn, logOut, productNumber, updateProductNumber }}>
       {children}
     </AuthContext.Provider>
   );

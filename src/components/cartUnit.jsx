@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { FaTrash, FaCheckCircle } from "react-icons/fa";
 import { GrEdit } from "react-icons/gr";
 import { api } from "../core/api";
+import { AuthContext } from "../context/AuthContext";
 
 const CartUnit = ({
   id,
@@ -17,6 +18,8 @@ const CartUnit = ({
   updateUnitQuantity,
   deleteUnit,
 }) => {
+  const { productNumber, updateProductNumber } = useContext(AuthContext);
+
   const [editQuantity, setEditQuantity] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -30,6 +33,7 @@ const CartUnit = ({
       });
 
       updateUnitQuantity(id, Number(editQuantity));
+      updateProductNumber(productNumber - quantity + +editQuantity);
     } catch (err) {
       console.error(`Error updating quantity: ${err}`);
     } finally {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../core/api";
 import { useUpdate } from "../hooks/use-update";
@@ -13,8 +13,11 @@ import { loadStripe } from "@stripe/stripe-js";
 import Button from "../components/button";
 import Notification from "../components/notification";
 import { MdAddCircle, MdError } from "react-icons/md";
+import { AuthContext } from "../context/AuthContext";
 
 const Cart = () => {
+  const { productNumber, updateProductNumber } = useContext(AuthContext);
+
   const serviceID = import.meta.env.VITE_SERVICE_ID;
   const templateID = import.meta.env.VITE_TEMPLATE_ID;
   const publicKey = import.meta.env.VITE_PUBLIC_KEY;
@@ -188,6 +191,8 @@ const Cart = () => {
       await Promise.all(requests);
 
       await Promise.all([refetchUnits(), productID && refetchProducts()]);
+
+      updateProductNumber(productNumber - quantity);
     } catch (err) {
       console.error("Error during delete/patch:", err);
       alert("An error occurred. Please try again.");
@@ -355,8 +360,6 @@ const Cart = () => {
     userAddress.email &&
     userAddress.phone;
 
-  if (loading) return <Loading msg={"Orders are still loading..."} />;
-
   return (
     <div className="w-full flex flex-col items-center">
       <div className="w-[80%] xl:w-full flex flex-col items-center bg-black/70 rounded-md shadow-lg shadow-red-800 min-h-screen my-20 xl:my-0">
@@ -370,6 +373,7 @@ const Cart = () => {
             />
           </div>
         )}
+        {loading && <Loading msg="Please wait. Order units are still loading..." />}
         {dynamicMap?.length > 0 ? (
           <div className="flex flex-col w-[120rem] 2xl:w-[100rem] md:w-[80rem] sm:w-[60rem] max-w-full text-[2rem] 2xl:text-[1.8rem] md:text-[1.5rem] sm:text-[1.2rem] mt-20 bg-black text-red-600 rounded-md py-10">
             <div className="flex flex-col [&>*]:px-5">
