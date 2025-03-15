@@ -2,14 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  font-size: 62.5%;
+}
+
 @media (min-width: 2200px) {
   html {
     font-size: 75%;
   }
-}
-
-html {
-  font-size: 62.5%;
 }
 
 @media (max-width: 1200px) {
