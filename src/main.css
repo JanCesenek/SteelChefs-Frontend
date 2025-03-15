@@ -76,6 +76,20 @@ h1 {
   }
 }
 
+@media (max-width: 1200px) {
+  .youtube-limit {
+    max-width: 60rem;
+    max-height: 40rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .youtube-limit {
+    max-width: 40rem;
+    max-height: 20rem;
+  }
+}
+
 .link-class {
   color: purple;
   text-decoration: underline;
