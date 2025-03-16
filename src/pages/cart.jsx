@@ -323,6 +323,8 @@ const Cart = () => {
             console.error("Error sending email:", error);
           });
 
+        updateProductNumber(0);
+
         resetData(
           <>
             <MdAddCircle />
