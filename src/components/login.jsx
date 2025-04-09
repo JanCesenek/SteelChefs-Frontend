@@ -3,11 +3,9 @@ import { AuthContext } from "../context/AuthContext";
 import { Form } from "react-router-dom";
 import { api } from "../core/api";
 import Button from "./button";
-import { MdError } from "react-icons/md";
-import { TiTick } from "react-icons/ti";
 
-const Login = ({ swap, setNotification }) => {
-  const { logIn } = useContext(AuthContext);
+const Login = ({ swap }) => {
+  const { logIn, notifyContext } = useContext(AuthContext);
 
   const [loginDetails, setLoginDetails] = useState({
     username: "",
@@ -31,13 +29,6 @@ const Login = ({ swap, setNotification }) => {
     api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
   };
 
-  const resetData = (msg) => {
-    setNotification(msg);
-    setTimeout(() => {
-      setNotification(false);
-    }, 3000);
-  };
-
   const handleLogIn = async () => {
     const username =
       loginDetails?.username[0]?.toUpperCase() + loginDetails?.username?.slice(1).toLowerCase();
@@ -50,24 +41,16 @@ const Login = ({ swap, setNotification }) => {
         localStorage.setItem("token", token);
         logIn(username, admin);
         addBearerToken(token);
-        resetData(
-          <>
-            <TiTick />
-            <span>Login successful!</span>
-          </>
-        );
+        notifyContext("Logged in successfully!", "success");
       })
       .catch((err) => {
         console.log(`Invalid credentials - ${err}`);
-        resetData(
-          <>
-            <MdError />
-            <span>Invalid credentials! Please try again...</span>
-          </>
-        );
+        notifyContext("Invalid credentials!", "error");
+      })
+      .finally(() => {
+        setIsSubmitting(false);
+        swap();
       });
-    setIsSubmitting(false);
-    swap();
   };
 
   return (

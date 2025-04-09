@@ -11,8 +11,6 @@ import PaymentGateway from "../components/paymentGateway";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import Button from "../components/button";
-import Notification from "../components/notification";
-import { MdAddCircle, MdError } from "react-icons/md";
 import { AuthContext } from "../context/AuthContext";
 
 const Cart = () => {
@@ -107,8 +105,6 @@ const Cart = () => {
   }, []);
 
   let sum = 0;
-
-  const [notification, setNotification] = useState(false);
 
   const [autofill, setAutofill] = useState(false);
   const [userAddress, setUserAddress] = useState({
@@ -207,7 +203,7 @@ const Cart = () => {
     );
   };
 
-  const resetData = (msg) => {
+  const resetData = () => {
     setUserAddress({
       name: "",
       street: "",
@@ -216,8 +212,6 @@ const Cart = () => {
       email: "",
       phone: "",
     });
-    setNotification(msg);
-    setTimeout(() => setNotification(false), 3000);
   };
 
   const submitOrder = async () => {
@@ -324,22 +318,9 @@ const Cart = () => {
           });
 
         updateProductNumber(0);
-
-        resetData(
-          <>
-            <MdAddCircle />
-            <span>Order created successfully!</span>
-          </>
-        );
       })
       .catch((err) => {
         console.log(`Post req - ${err}`);
-        resetData(
-          <>
-            <MdError />
-            <span>Order could not be submitted, sorry. Please try again...</span>
-          </>
-        );
       });
 
     unprocessedUnits.map(async (el) => {
@@ -588,7 +569,6 @@ const Cart = () => {
                     (submittingOrder || !validForm) && "opacity-50 cursor-not-allowed"
                   } self-center`}
                 />
-                {notification && <Notification msg={notification} css="mt-10 self-center" />}
               </div>
             )}
           </div>

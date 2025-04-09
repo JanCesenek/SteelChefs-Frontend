@@ -4,7 +4,6 @@ import Login from "../components/login";
 import Signup from "../components/signup";
 import { api } from "../core/api";
 import { useUpdate } from "../hooks/use-update";
-import { MdEditDocument, MdError } from "react-icons/md";
 import { BsPencil } from "react-icons/bs";
 import { FiLogOut } from "react-icons/fi";
 import { ImCross } from "react-icons/im";
@@ -12,7 +11,6 @@ import { RiDeleteBin6Fill } from "react-icons/ri";
 import { FaArrowAltCircleDown, FaArrowAltCircleUp } from "react-icons/fa";
 import Button from "../components/button";
 import OrderDetail from "../components/orderDetail";
-import Notification from "../components/notification";
 
 const Auth = () => {
   const { data: usersData, refetch: refetchUsers } = useUpdate("/users");
@@ -30,12 +28,13 @@ const Auth = () => {
     fetchAll();
   }, []);
 
-  const { logOut } = useContext(AuthContext);
+  const { logOut, notifyContext } = useContext(AuthContext);
 
   const [newAccount, setNewAccount] = useState(false);
-  const [notification, setNotification] = useState(false);
   const [personalDetails, setPersonalDetails] = useState(false);
   const [orders, setOrders] = useState(false);
+
+  const [submitting, setSubmitting] = useState(false);
 
   const [editState, setEditState] = useState({
     firstName: false,
@@ -96,47 +95,21 @@ const Auth = () => {
     delete api.defaults.headers.common["Authorization"];
   };
 
-  const resetData = (msg) => {
-    setNotification(msg);
-    setTimeout(() => {
-      setNotification(false);
-    }, 3000);
-  };
-
   const editDetails = async (data) => {
+    setSubmitting(true);
     await api
       .patch(`/users/${curUser}`, data, {
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       })
       .then(async () => {
         await refetchUsers();
-        resetData(
-          <>
-            <MdEditDocument />
-            <span>Details updated successfully!</span>
-          </>
-        );
-        setEditState({
-          firstName: false,
-          lastName: false,
-          username: false,
-          password: false,
-          street: false,
-          postcode: false,
-          town: false,
-          email: false,
-          phone: false,
-        });
-        resetAll();
+        notifyContext("User details updated successfully", "success");
       })
       .catch((err) => {
         console.log(`Patch req - ${err}`);
-        resetData(
-          <>
-            <MdError />
-            <span>Error updating details!</span>
-          </>
-        );
+        notifyContext("Error while updating user details", "error");
+      })
+      .finally(() => {
         setEditState({
           firstName: false,
           lastName: false,
@@ -149,6 +122,7 @@ const Auth = () => {
           phone: false,
         });
         resetAll();
+        setSubmitting(false);
       });
   };
 
@@ -160,6 +134,7 @@ const Auth = () => {
 
   const deleteUser = async (e) => {
     if (window.confirm("Really wanna delete your account?")) {
+      setSubmitting(true);
       await api
         .delete(`/users/${curUser}`, {
           headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
@@ -169,14 +144,23 @@ const Auth = () => {
           removeBearerToken();
           localStorage.clear();
           setNewAccount(!newAccount);
+          notifyContext("User deleted successfully!", "success");
         })
-        .catch((err) => console.log(`Delete req - ${err}`));
+        .catch((err) => {
+          console.log(`Delete req - ${err}`);
+          notifyContext("Error while deleting user!", "error");
+        })
+        .finally(() => {
+          setSubmitting(false);
+        });
     } else e.preventDefault();
   };
 
   return (
-    <div className="w-full min-h-screen flex flex-col items-center">
-      {notification && <Notification msg={notification} css="mt-20" />}
+    <div
+      className={`w-full min-h-screen flex flex-col items-center ${
+        submitting && "cursor-not-allowed opacity-70 pointer-events-none"
+      }`}>
       {/* If a user is logged in */}
       {curUser ? (
         <div className="bg-black/70 w-[80%] sm:w-full min-h-screen flex flex-col items-center rounded-md shadow-lg shadow-red-600 text-red-600 my-20 sm:my-0 p-10 [&>*]:my-5 [&>*]:rounded-md [&>*]:p-5">
@@ -540,9 +524,9 @@ const Auth = () => {
           )}
         </div>
       ) : newAccount ? (
-        <Signup swap={() => setNewAccount(false)} setNotification={(msg) => setNotification(msg)} />
+        <Signup swap={() => setNewAccount(false)} />
       ) : (
-        <Login swap={() => setNewAccount(true)} setNotification={(msg) => setNotification(msg)} />
+        <Login swap={() => setNewAccount(true)} />
       )}
     </div>
   );

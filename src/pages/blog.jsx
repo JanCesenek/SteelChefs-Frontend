@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import Editor, { editorExtensions } from "../components/editor";
 import { api } from "../core/api";
 import { useUpdate } from "../hooks/use-update";
@@ -8,21 +8,21 @@ import Article from "../components/article";
 import ArticleDetail from "../components/articleDetail";
 import { ImCross } from "react-icons/im";
 import Button from "../components/button";
-import Notification from "../components/notification";
 import { MdAddCircle, MdDelete, MdError } from "react-icons/md";
 import { BsFillFileImageFill } from "react-icons/bs";
 import { v4 as uuid } from "uuid";
 import supabase from "../core/sup";
+import { AuthContext } from "../context/AuthContext";
 
 const Blog = () => {
+  const { notifyContext } = useContext(AuthContext);
+
   const [addArticle, setAddArticle] = useState(false);
   const [fullScreen, setFullScreen] = useState(false);
 
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
   const [content, setContent] = useState(null);
-
-  const [notification, setNotification] = useState(false);
 
   const [articleDetail, setArticleDetail] = useState(false);
 
@@ -51,8 +51,7 @@ const Blog = () => {
 
   const userData = usersData?.find((user) => user.username === curUser);
 
-  const resetData = (msg) => {
-    setNotification(msg);
+  const resetData = () => {
     setTitle("");
     setImage(null);
     setCategory("");
@@ -60,12 +59,6 @@ const Blog = () => {
     setAddArticle(false);
     setSubmitting(false);
     fullScreen && setFullScreen(false);
-    setTimeout(() => setNotification(false), 3000);
-  };
-
-  const softReset = (msg) => {
-    setNotification(msg);
-    setTimeout(() => setNotification(false), 3000);
   };
 
   const createArticle = async () => {
@@ -111,45 +104,33 @@ const Blog = () => {
       .post("/articles", postReqPayload)
       .then(async () => {
         await refetchArticles();
-        resetData(
-          <>
-            <MdAddCircle />
-            <span>Article created successfully!</span>
-          </>
-        );
+        notifyContext("Article created successfully!", "success");
       })
       .catch((err) => {
         console.log(`Post req - ${err}`);
-        resetData(
-          <>
-            <MdError />
-            <span>Failed to create article! Something went wrong...</span>
-          </>
-        );
+        notifyContext("Failed to create article!", "error");
+      })
+      .finally(() => {
+        setSubmitting(false);
+        resetData();
       });
   };
 
   const deleteArticle = async (id) => {
     if (window.confirm("Are you sure you want to delete this article?")) {
+      setSubmitting(true);
       await api
         .delete(`/articles/${id}`)
         .then(async () => {
           await refetchArticles();
-          resetData(
-            <>
-              <MdDelete />
-              <span>Article deleted successfully!</span>
-            </>
-          );
+          notifyContext("Article deleted successfully!", "success");
         })
         .catch((err) => {
           console.log(`Delete req - ${err}`);
-          resetData(
-            <>
-              <MdError />
-              <span>Failed to delete article! Something went wrong...</span>
-            </>
-          );
+          notifyContext("Failed to delete article!", "error");
+        })
+        .finally(() => {
+          setSubmitting(false);
         });
     }
   };
@@ -161,7 +142,10 @@ const Blog = () => {
   if (loading) return <Loading msg={"Articles are still loading..."} />;
 
   return (
-    <div className="w-full flex flex-col items-center">
+    <div
+      className={`w-full flex flex-col items-center ${
+        submitting && "cursor-not-allowed opacity-70 pointer-events-none"
+      }`}>
       <div className="w-[80%] sm:w-full flex flex-col items-center bg-black/70 rounded-md shadow-lg shadow-red-800 min-h-screen my-20 sm:my-0">
         {!articleDetail && (
           <Button
@@ -180,7 +164,6 @@ const Blog = () => {
             content={articleDetail?.content}
             back={() => setArticleDetail(false)}
             refetch={refetchArticles}
-            notify={softReset}
           />
         ) : addArticle ? (
           <div
@@ -251,7 +234,6 @@ const Blog = () => {
           </div>
         ) : (
           <div className="flex flex-col items-center w-full">
-            {notification && <Notification msg={notification} css="my-10" />}
             <div className="grid justify-items-center grid-cols-4 2xl:grid-cols-3 lg:grid-cols-2 sm:grid-cols-1 w-[90%]">
               {articlesData?.map((article) => {
                 const articleOwner = usersData.find((user) => user.id === article.userID);

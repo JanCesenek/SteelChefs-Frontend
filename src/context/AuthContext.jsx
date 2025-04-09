@@ -1,4 +1,6 @@
 import React, { createContext, useState, useEffect } from "react";
+import { toast, Flip } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export const AuthContext = createContext();
 
@@ -37,9 +39,37 @@ export const AuthProvider = ({ children }) => {
     setProductNumber(number);
   };
 
+  const notifyContext = (msg, state) => {
+    if (state === "success") {
+      toast.success(msg, {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Flip,
+      });
+    } else if (state === "error") {
+      toast.error(msg, {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Flip,
+      });
+    }
+  };
+
   return (
     <AuthContext.Provider
-      value={{ curUser, admin, logIn, logOut, productNumber, updateProductNumber }}>
+      value={{ curUser, admin, logIn, logOut, productNumber, updateProductNumber, notifyContext }}>
       {children}
     </AuthContext.Provider>
   );

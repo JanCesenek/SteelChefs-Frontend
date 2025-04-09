@@ -6,7 +6,6 @@ import { BsStar, BsStarFill, BsStarHalf } from "react-icons/bs";
 import { MdAddCircle, MdDelete, MdError } from "react-icons/md";
 import Review from "../components/review";
 import Button from "../components/button";
-import Notification from "../components/notification";
 
 const Reviews = () => {
   const { data: usersData, refetch: refetchUsers, isLoading: usersLoading } = useUpdate("/users");
@@ -143,17 +142,11 @@ const Reviews = () => {
   const [rating, setRating] = useState(1);
   const [submitting, setSubmitting] = useState(false);
 
-  const [notification, setNotification] = useState(false);
-
-  const resetData = (msg) => {
-    setNotification(msg);
+  const resetData = () => {
     setAddReview(false);
     setSubmitting(false);
     setMessage("");
     setRating(1);
-    setTimeout(() => {
-      setNotification(false);
-    }, 3000);
   };
 
   const submitReview = async () => {
@@ -166,21 +159,9 @@ const Reviews = () => {
       })
       .then(async () => {
         await refetchReviews();
-        resetData(
-          <>
-            <MdAddCircle />
-            <p>Review submitted successfully!</p>
-          </>
-        );
       })
       .catch((err) => {
         console.log(`Post req - ${err}`);
-        resetData(
-          <>
-            <MdError />
-            <p>Failed to submit review!</p>
-          </>
-        );
       });
   };
 
@@ -190,21 +171,9 @@ const Reviews = () => {
         .delete(`/reviews/${id}`)
         .then(async () => {
           await refetchReviews();
-          resetData(
-            <>
-              <MdDelete />
-              <p>Review deleted successfully!</p>
-            </>
-          );
         })
         .catch((err) => {
           console.log(`req - ${err}`);
-          resetData(
-            <>
-              <MdError />
-              <p>Failed to delete review!</p>
-            </>
-          );
         });
     }
   };

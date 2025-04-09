@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import { FaSignOutAlt } from "react-icons/fa";
 import { ImCross } from "react-icons/im";
-import { MdEditDocument, MdError } from "react-icons/md";
 import Editor from "./editor";
 import parse from "html-react-parser";
 import { api } from "../core/api";
 import Button from "./button";
 
-const ArticleDetail = ({ id, image, title, category, owner, content, back, refetch, notify }) => {
+const ArticleDetail = ({ id, image, title, category, owner, content, back, refetch }) => {
   const curUser = localStorage.getItem("curUser");
 
   const [edit, setEdit] = useState(false);
@@ -18,11 +17,10 @@ const ArticleDetail = ({ id, image, title, category, owner, content, back, refet
 
   const [fullScreen, setFullScreen] = useState(false);
 
-  const resetData = (msg) => {
+  const resetData = () => {
     setEdit(false);
     setFullScreen(false);
     setSubmitting(false);
-    notify(msg);
     back();
   };
 
@@ -37,21 +35,9 @@ const ArticleDetail = ({ id, image, title, category, owner, content, back, refet
       })
       .then(async () => {
         await refetch();
-        resetData(
-          <>
-            <MdEditDocument />
-            <span>Article updated successfully!</span>
-          </>
-        );
       })
       .catch((err) => {
         console.log(`Patch req - ${err}`);
-        resetData(
-          <>
-            <MdError />
-            <span>Failed to update article!</span>
-          </>
-        );
       });
   };
 

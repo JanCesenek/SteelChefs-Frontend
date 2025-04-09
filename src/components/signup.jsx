@@ -8,7 +8,7 @@ import { FaArrowAltCircleDown, FaArrowAltCircleUp } from "react-icons/fa";
 import Button from "./button";
 import { MdAddCircle } from "react-icons/md";
 
-const Signup = ({ swap, setNotification }) => {
+const Signup = ({ swap }) => {
   const {
     value: firstNameValue,
     isValid: firstNameIsValid,
@@ -111,17 +111,10 @@ const Signup = ({ swap, setNotification }) => {
     reset: phoneReset,
   } = UseInput((value) => /^[0-9\s]+$/.test(value) && value.length >= 8 && value.length <= 12);
 
-  const { logIn } = useContext(AuthContext);
+  const { logIn, notifyContext } = useContext(AuthContext);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [rules, setRules] = useState(false);
-
-  const resetData = (msg) => {
-    setNotification(msg);
-    setTimeout(() => {
-      setNotification(false);
-    }, 3000);
-  };
 
   const { refetch } = useUpdate("/users");
 
@@ -171,26 +164,17 @@ const Signup = ({ swap, setNotification }) => {
         localStorage.setItem("token", token);
         logIn(username, admin);
         addBearerToken(token);
-        resetForm();
-        resetData(
-          <>
-            <MdAddCircle />
-            <span>Account created successfully!</span>
-          </>
-        );
+        notifyContext("Signed up successfully!", "success");
       })
       .catch((err) => {
         console.log(`Post req - ${err}`);
+        notifyContext("Invalid credentials!", "error");
+      })
+      .finally(() => {
+        setIsSubmitting(false);
+        swap();
         resetForm();
-        resetData(
-          <>
-            <MdError />
-            <span>Account creation failed!</span>
-          </>
-        );
       });
-    setIsSubmitting(false);
-    swap();
   };
 
   const validForm =

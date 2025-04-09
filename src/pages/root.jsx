@@ -4,6 +4,8 @@ import MainNavigation from "../components/mainNavigation";
 import { v4 as uuid } from "uuid";
 import { getTokenExpiry } from "../../utils/token";
 import { api } from "../core/api";
+import { ToastContainer, Flip } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const RootLayout = () => {
   const uniqueID = localStorage.getItem("uniqueID");
@@ -33,6 +35,19 @@ const RootLayout = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-black/80 text-red-600">
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+        transition={Flip}
+      />
       <div className="w-full bg-black/40 shadow-lg shadow-red-600/30 flex justify-center items-center">
         <img
           src="https://jwylvnqdlbtbmxsencfu.supabase.co/storage/v1/object/public/steelchefs/staticImgs/SteelchefsLogoRed.png"

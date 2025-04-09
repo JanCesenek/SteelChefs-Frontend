@@ -1,11 +1,9 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import { Form } from "react-router-dom";
 import { useUpdate } from "../hooks/use-update";
 import { FaFolderPlus } from "react-icons/fa6";
 import { BsFillFileImageFill } from "react-icons/bs";
-import { FaCheckCircle } from "react-icons/fa";
 import { GiMagnifyingGlass } from "react-icons/gi";
-import { MdAddCircle, MdDelete, MdError } from "react-icons/md";
 import { VscExpandAll, VscCollapseAll } from "react-icons/vsc";
 import { v4 as uuid } from "uuid";
 import { api } from "../core/api";
@@ -14,9 +12,11 @@ import Product from "../components/product";
 import ProductDetail from "../components/productDetail";
 import Loading from "../components/loading";
 import Button from "../components/button";
-import Notification from "../components/notification";
+import { AuthContext } from "../context/AuthContext";
 
 const Products = () => {
+  const { notifyContext } = useContext(AuthContext);
+
   const { data: usersData, refetch: refetchUsers, isLoading: usersLoading } = useUpdate("/users");
   const {
     data: productsData,
@@ -37,9 +37,9 @@ const Products = () => {
   useEffect(() => {
     const fetchAll = async () => {
       try {
+        await refetchProducts();
         await refetchUnits();
         await refetchUsers();
-        await refetchProducts();
         await refetchImages();
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -50,8 +50,6 @@ const Products = () => {
   }, []);
 
   const [addProduct, setAddProduct] = useState(false);
-
-  const [notification, setNotification] = useState(false);
 
   const [submitting, setSubmitting] = useState(false);
 
@@ -103,7 +101,7 @@ const Products = () => {
     setFilteredProducts(filtered);
   };
 
-  const resetData = (msg) => {
+  const resetData = () => {
     setProductSpec({
       title: "",
       description: "",
@@ -111,13 +109,9 @@ const Products = () => {
       quantity: 0,
       category: "",
     });
-    setNotification(msg);
     setAddProduct(false);
     setImage(null);
     setImages([]);
-    setTimeout(() => {
-      setNotification(false);
-    }, 3000);
   };
 
   const newProduct = async () => {
@@ -163,23 +157,12 @@ const Products = () => {
     await api
       .post("/products", postReqPayload)
       .then(async () => {
-        const tempData = await refetchProducts();
-        setProductsData(tempData.data);
-        resetData(
-          <>
-            <span>Product added successfully!</span>
-            <MdAddCircle />
-          </>
-        );
+        await refetchProducts();
+        notifyContext("Product created successfully!", "success");
       })
       .catch((err) => {
         console.log(`Post req - ${err}`);
-        resetData(
-          <>
-            <span>Incorrect details!</span>
-            <MdError />
-          </>
-        );
+        notifyContext("Error creating product!", "error");
       });
 
     const updatedProducts = await refetchProducts();
@@ -222,22 +205,12 @@ const Products = () => {
           .then(async () => await refetchImages())
           .catch((err) => {
             console.log(`Post req - ${err}`);
-            resetData(
-              <>
-                <span>Invalid images!</span>
-                <MdError />
-              </>
-            );
+            notifyContext("Error uploading images!", "error");
           });
       });
     };
     images && (await uploadMoreImgs());
-    resetData(
-      <>
-        <span>Product created successfully!</span>
-        <FaCheckCircle />
-      </>
-    );
+    resetData();
     setSubmitting(false);
   };
 
@@ -257,21 +230,20 @@ const Products = () => {
         }
       });
 
+      setSubmitting(true);
       await api
         .delete(`/products/${id}`, {
           headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         })
         .then(async () => {
-          const tempData = await refetchProducts();
-          setProductsData(tempData.data);
-          resetData(
-            <>
-              <span>Product removed successfully!</span>
-              <MdDelete />
-            </>
-          );
+          await refetchProducts();
+          notifyContext("Product deleted successfully!", "success");
         })
-        .catch((err) => console.log(`Delete req - ${err}`));
+        .catch((err) => {
+          console.log(`Delete req - ${err}`);
+          notifyContext("Error deleting product!", "error");
+        });
+      setSubmitting(false);
     }
   };
 
@@ -293,7 +265,10 @@ const Products = () => {
   if (loading) return <Loading msg={"Products are still loading..."} />;
 
   return (
-    <div className="w-full min-h-screen flex flex-col items-center">
+    <div
+      className={`w-full min-h-screen flex flex-col items-center ${
+        submitting && "cursor-not-allowed opacity-70 pointer-events-none"
+      }`}>
       <div className="my-20 sm:my-0 w-[80%] sm:w-full flex flex-col items-center bg-black/70 rounded-md text-red-500 min-h-screen shadow-lg sm:shadow-none shadow-red-800 [&>*]:my-5">
         {admin === "true" && !productDetail && (
           <Button
@@ -311,7 +286,6 @@ const Products = () => {
             click={() => setAddProduct(!addProduct)}
           />
         )}
-        {notification && <Notification msg={notification} />}
         {addProduct && (
           <Form className="flex flex-col [&>*]:my-5 bg-black rounded-md p-20 shadow-md shadow-red-800 max-w-full">
             <div className="flex items-center">
