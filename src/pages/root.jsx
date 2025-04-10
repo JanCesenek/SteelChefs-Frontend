@@ -47,6 +47,7 @@ const RootLayout = () => {
         pauseOnHover
         theme="dark"
         transition={Flip}
+        style={{ fontSize: "1.5rem" }}
       />
       <div className="w-full bg-black/40 shadow-lg shadow-red-600/30 flex justify-center items-center">
         <img
