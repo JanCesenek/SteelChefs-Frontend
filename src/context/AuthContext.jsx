@@ -1,6 +1,8 @@
 import React, { createContext, useState, useEffect } from "react";
 import { toast, Flip } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Success from "../audio/Success.mp3";
+import Error from "../audio/Error.mp3";
 
 export const AuthContext = createContext();
 
@@ -41,6 +43,8 @@ export const AuthProvider = ({ children }) => {
 
   const notifyContext = (msg, state) => {
     if (state === "success") {
+      const audio = new Audio(Success);
+      audio.play();
       toast.success(msg, {
         position: "top-center",
         autoClose: 3000,
@@ -53,6 +57,8 @@ export const AuthProvider = ({ children }) => {
         transition: Flip,
       });
     } else if (state === "error") {
+      const audio = new Audio(Error);
+      audio.play();
       toast.error(msg, {
         position: "top-center",
         autoClose: 3000,
