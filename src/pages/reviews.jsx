@@ -3,7 +3,6 @@ import Loading from "../components/loading";
 import { api } from "../core/api";
 import { useUpdate } from "../hooks/use-update";
 import { BsStar, BsStarFill, BsStarHalf } from "react-icons/bs";
-import { MdAddCircle, MdDelete, MdError } from "react-icons/md";
 import Review from "../components/review";
 import Button from "../components/button";
 
@@ -162,6 +161,9 @@ const Reviews = () => {
       })
       .catch((err) => {
         console.log(`Post req - ${err}`);
+      })
+      .finally(() => {
+        resetData();
       });
   };
 
@@ -193,9 +195,11 @@ const Reviews = () => {
   if (loading) return <Loading msg={"Reviews are still loading..."} />;
 
   return (
-    <div className="w-full flex flex-col items-center">
+    <div
+      className={`w-full flex flex-col items-center ${
+        submitting && "opacity-70 pointer-events-none"
+      }`}>
       <div className="w-[80%] sm:w-full flex flex-col items-center bg-black/70 rounded-md shadow-lg shadow-red-800 min-h-screen my-20 py-20 sm:my-0">
-        {notification && <Notification msg={notification} />}
         <div className="flex flex-col items-center">
           {!hasReview && curUser && (
             <Button

@@ -20,7 +20,7 @@ const ProductDetail = ({
   unitsData,
   back,
 }) => {
-  const { productNumber, updateProductNumber } = useContext(AuthContext);
+  const { productNumber, updateProductNumber, notifyContext } = useContext(AuthContext);
 
   const [purchasedAmount, setPurchasedAmount] = useState(1);
 
@@ -66,6 +66,7 @@ const ProductDetail = ({
       updateProductNumber(productNumber + +purchasedAmount);
     } catch (err) {
       console.error(`Error updating quantity: ${err}`);
+      notifyContext("Error purchasing item. Please try again.", "error");
     } finally {
       setPurchasedAmount(1);
       setSubmitting(false);

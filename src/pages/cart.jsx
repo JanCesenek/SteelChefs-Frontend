@@ -14,7 +14,7 @@ import Button from "../components/button";
 import { AuthContext } from "../context/AuthContext";
 
 const Cart = () => {
-  const { productNumber, updateProductNumber } = useContext(AuthContext);
+  const { productNumber, updateProductNumber, notifyContext } = useContext(AuthContext);
 
   const serviceID = import.meta.env.VITE_SERVICE_ID;
   const templateID = import.meta.env.VITE_TEMPLATE_ID;
@@ -92,7 +92,6 @@ const Cart = () => {
     api.get("/config").then(async (res) => {
       const { publishableKey } = await res.data;
       setStripePromise(loadStripe(publishableKey));
-      console.log("Publishable key:", publishableKey);
     });
   }, []);
 
@@ -100,7 +99,6 @@ const Cart = () => {
     api.post("/create-payment-intent", { amount: 1000, currency: "eur" }).then(async (res) => {
       const { clientSecret } = await res.data;
       setPaymentClientSecret(clientSecret);
-      console.log("Client secret:", clientSecret);
     });
   }, []);
 
@@ -191,7 +189,7 @@ const Cart = () => {
       updateProductNumber(productNumber - quantity);
     } catch (err) {
       console.error("Error during delete/patch:", err);
-      alert("An error occurred. Please try again.");
+      notifyContext("Error deleting item. Please try again.", "error");
     } finally {
       setSubmittingUnits(false);
     }
@@ -315,12 +313,15 @@ const Cart = () => {
           })
           .catch((error) => {
             console.error("Error sending email:", error);
+            notifyContext("Error sending email. Please check your email address.", "error");
           });
 
         updateProductNumber(0);
+        notifyContext("Order placed successfully! Check your email for confirmation.", "success");
       })
       .catch((err) => {
         console.log(`Post req - ${err}`);
+        notifyContext("Error placing order. Please try again.", "error");
       });
 
     unprocessedUnits.map(async (el) => {
