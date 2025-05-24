@@ -4,6 +4,8 @@ import MainNavigation from "../components/mainNavigation";
 import { v4 as uuid } from "uuid";
 import { getTokenExpiry } from "../../utils/token";
 import { api } from "../core/api";
+import { FaCopyright } from "react-icons/fa";
+import logo from "/flamebulb.svg";
 import { ToastContainer, Flip } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -58,6 +60,14 @@ const RootLayout = () => {
       </div>
       <MainNavigation />
       <Outlet />
+      <div className="w-full h-[4rem] bg-black flex justify-center items-center text-[1.5rem] mt-20">
+        <FaCopyright className=" mr-2" />
+        <div className="flex items-center">
+          <p className="mr-2">|</p>
+          <img src={logo} alt="logo" className="w-[1.5rem]" />
+          <p className="ml-2">Jan Cesenek 2025 | All rights reserved</p>
+        </div>
+      </div>
     </div>
   );
 };
