@@ -5,13 +5,32 @@ import { api } from "../core/api";
 import { IoIosWarning } from "react-icons/io";
 
 const PaymentGateway = ({ total, confirmDelivery, setClientSecret }) => {
+  useEffect(() => {
+    const handleResize = () => {
+      setCardFontSize(window.innerWidth < 640 ? "6px" : "10px");
+    };
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   const stripe = useStripe();
   const elements = useElements();
   const [message, setMessage] = useState("");
   const [isCardValid, setIsCardValid] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [cardFontSize, setCardFontSize] = useState(window.innerWidth < 640 ? "6px" : "10px");
 
   console.log(total());
+
+  const cardStyle = {
+    style: {
+      base: {
+        fontSize: cardFontSize,
+      },
+    },
+  };
 
   const createPaymentIntent = async (amount) => {
     try {
@@ -70,7 +89,7 @@ const PaymentGateway = ({ total, confirmDelivery, setClientSecret }) => {
   };
 
   return (
-    <div className="m-5 p-5 w-1/2 self-center flex flex-col bg-white rounded-lg shadow-md shadow-white text-black">
+    <div className="m-5 p-5 !w-1/2 md:!w-2/3 sm:!w-4/5 self-center flex flex-col bg-white rounded-lg shadow-md shadow-white text-black">
       <div className="flex items-center text-[1.4rem] my-5 p-5 border border-red-500 rounded-md">
         <IoIosWarning className="text-red-500" />
         <p className="ml-5">
@@ -78,7 +97,7 @@ const PaymentGateway = ({ total, confirmDelivery, setClientSecret }) => {
           details to proceed.
         </p>
       </div>
-      <CardElement onChange={handleCardChange} />
+      <CardElement onChange={handleCardChange} options={cardStyle} />
       <button
         className={`border border-black rounded-md px-5 self-center mt-10 ${
           (!isCardValid || isProcessing) && "opacity-50 cursor-not-allowed"

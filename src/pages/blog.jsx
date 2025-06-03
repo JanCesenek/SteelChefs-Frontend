@@ -147,7 +147,7 @@ const Blog = () => {
         submitting && "cursor-not-allowed opacity-70 pointer-events-none"
       }`}>
       <div className="w-[80%] sm:w-full flex flex-col items-center bg-black/70 rounded-md shadow-lg shadow-red-800 min-h-screen my-20 sm:my-0">
-        {!articleDetail && (
+        {!articleDetail && userData && (
           <Button
             click={() => setAddArticle(!addArticle)}
             msg={addArticle ? "Hide" : "Add article"}
