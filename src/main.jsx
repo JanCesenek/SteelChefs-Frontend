@@ -1,3 +1,7 @@
+if (process.env.NODE_ENV === "production") {
+  console.log = function () {};
+}
+
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./main.css";
@@ -12,5 +16,5 @@ root.render(
     <QueryClientProvider client={client}>
       <App />
     </QueryClientProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );
